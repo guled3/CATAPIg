@@ -1,26 +1,15 @@
 import React, { Component } from 'react';
-import axios from '../src/CatApi';
+import { getBreeds, getCatsImagesByBreed} from '../src/CatApi';
 import './App.css';
 
 
 
 class App extends Component {
 
-  async getBreeds() {
-      const res = await axios('/breeds');
-      return res.data;
-  }
-  async getCatsImagesByBreed(breed_id, amount) {
-      const res = await axios('/images/search?breed_ids='+breed_id + "&limit="+ amount);
-      
-      console.table(res.data)
-      return res.data;
-  }
-
   async loadBreedImages() {
     console.log('Load Breed Images:', this.state.selected_breed)
 
-    let breed_images = await this.getCatsImagesByBreed(this.state.selected_breed, 5)
+    let breed_images = await getCatsImagesByBreed(this.state.selected_breed, 5)
 
     this.setState({ images: breed_images });
   }
@@ -45,7 +34,7 @@ class App extends Component {
       if (this.state.breeds.length===0) {
           (async () => {
               try {
-                  this.setState({breeds: await this.getBreeds()});
+                  this.setState({breeds: await getBreeds()});
               } catch (e) {
                   //...handle the error...
                   console.error(e)
