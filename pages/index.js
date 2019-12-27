@@ -1,63 +1,63 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { getBreeds, getCatsImagesByBreed} from '../src/CatApi';
 import './App.css';
 
+function myApp (props) {
+  const [images,setImages] = useState([]);
+  const [breeds, setBreeds] = useState([]);
+  const [selected_breed, setselected_breed] = useState("aege");
 
+  async function loadBreedImages() {
+    console.log('Load Breed Images:', selected_breed)
 
-class App extends Component {
+    let breed_images = await getCatsImagesByBreed(selected_breed, 5)
 
-  async loadBreedImages() {
-    console.log('Load Breed Images:', this.state.selected_breed)
-
-    let breed_images = await getCatsImagesByBreed(this.state.selected_breed, 5)
-
-    this.setState({ images: breed_images });
+    setImages(breed_images);
   }
 
-  constructor(...args) {
-
-      super(...args);
-      this.state = {
-        images: [],
-        breeds: [], 
-        selected_breed: 0
-      };
-
-    this.onBreedSelectChange = this.onBreedSelectChange.bind(this);
-  }
-  async onBreedSelectChange(e) {
+  async function onBreedSelectChange(e) {
     console.log("Breed Selected. ID:",e.target.value)
-    await this.setState({selected_breed:e.target.value});
-    await this.loadBreedImages();
+    await setselected_breed(e.target.value);
   }
-  componentDidMount() {
-      if (this.state.breeds.length===0) {
-          (async () => {
-              try {
-                  this.setState({breeds: await getBreeds()});
-              } catch (e) {
-                  //...handle the error...
-                  console.error(e)
-              }
-          })();
-      }
+
+  //useEffect runs onComponentMount
+  useEffect(() => {
+    if (breeds.length===0) {
+      (async () => {
+          try {
+              setBreeds(await getBreeds());
+          } catch (e) {
+              //...handle the error...
+              console.error(e)
+          }
+      })();
   }
-  render() {
-      return (
-        <div>
 
-      <select value={this.state.selected_breed} 
-              onChange={this.onBreedSelectChange}>
-        {this.state.breeds.map((breed) => <option key={breed.id} value={breed.id}>{breed.name}</option>)}
-      </select>
+  },[]);
 
-      <div>
-     {this.state.images.map((image) => <img className="cat-image" alt="" src={image.url}></img>)}
-     </div>
+  useEffect(() => {
+    console.log(selected_breed)
+    console.log("breed change")
+    loadBreedImages();
+  
 
-     </div>
-      );
-  }
+  },[selected_breed]);
+
+  return (
+    <div>
+
+  <select value={selected_breed} 
+          onChange={onBreedSelectChange}>
+    {breeds.map((breed) => <option key={breed.id} value={breed.id}>{breed.name}</option>)}
+  </select>
+
+  <div>
+ {images.map((image) => <img className="cat-image" alt="" src={image.url}></img>)}
+ </div>
+
+ </div>)
+
 }
 
-export default App;
+
+export default myApp;
