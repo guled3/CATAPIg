@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getBreeds, getCatsImagesByBreed} from '../src/CatApi';
+import { getCatsImagesByBreed} from '../src/CatApi';
 import './App.css';
+import { CatDropdown, ImageList } from '../src/components'
 
 function myApp (props) {
   const [images,setImages] = useState([]);
-  const [breeds, setBreeds] = useState([]);
   const [selected_breed, setselected_breed] = useState("aege");
 
   async function loadBreedImages() {
@@ -20,42 +20,21 @@ function myApp (props) {
     await setselected_breed(e.target.value);
   }
 
-  //useEffect runs onComponentMount
   useEffect(() => {
-    if (breeds.length===0) {
-      (async () => {
-          try {
-              setBreeds(await getBreeds());
-          } catch (e) {
-              //...handle the error...
-              console.error(e)
-          }
+    (async () => {
+        console.log(selected_breed)
+        console.log("breed change")
+        await loadBreedImages();
       })();
-  }
-
-  },[]);
-
-  useEffect(() => {
-    console.log(selected_breed)
-    console.log("breed change")
-    loadBreedImages();
+    
   
-
   },[selected_breed]);
 
   return (
     <div>
-
-  <select value={selected_breed} 
-          onChange={onBreedSelectChange}>
-    {breeds.map((breed) => <option key={breed.id} value={breed.id}>{breed.name}</option>)}
-  </select>
-
-  <div>
- {images.map((image) => <img className="cat-image" alt="" src={image.url}></img>)}
- </div>
-
- </div>)
+        <CatDropdown selectedBreed={selected_breed} onBreedSelectChange={onBreedSelectChange} />
+        <ImageList images={images} />
+    </div>)
 
 }
 
